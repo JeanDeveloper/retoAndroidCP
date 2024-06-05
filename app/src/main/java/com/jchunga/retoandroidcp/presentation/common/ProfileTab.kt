@@ -21,15 +21,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.jchunga.retoandroidcp.core.Screen
 import com.jchunga.retoandroidcp.core.Tab
 import com.jchunga.retoandroidcp.domain.model.AuthState
+import com.jchunga.retoandroidcp.presentation.navigation.localHomeNavController
 import com.jchunga.retoandroidcp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
@@ -41,10 +45,15 @@ fun ProfileTab(
     val authState by mainViewModel.authState.observeAsState( )
 
     val user = mainViewModel.getCurrentUser()
+
+    val navController = localHomeNavController.current
+
+    val coroutineScope = rememberCoroutineScope()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+
     ){
         Column(
             modifier = Modifier
@@ -84,7 +93,17 @@ fun ProfileTab(
 
             // Botón de cerrar sesión
             Button(
-                onClick = {},
+                onClick = {
+                    coroutineScope.launch {
+                        // Cerrar sesión del usuario
+                        mainViewModel.signOut()
+                        // Navegar de vuelta a LoginScreen
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp)

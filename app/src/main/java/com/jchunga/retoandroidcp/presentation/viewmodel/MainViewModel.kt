@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthCredential
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
+
 import com.jchunga.retoandroidcp.core.Tab
 import com.jchunga.retoandroidcp.domain.model.AppState
 import com.jchunga.retoandroidcp.domain.model.AuthState
@@ -21,8 +23,10 @@ import com.jchunga.retoandroidcp.domain.usecase.GetCandyListCaseUse
 import com.jchunga.retoandroidcp.domain.usecase.GetPremierListCaseUse
 import com.jchunga.retoandroidcp.domain.usecase.PayingCaseUse
 import com.jchunga.retoandroidcp.domain.usecase.SignInWithGoogleUseCase
+//import com.jchunga.retoandroidcp.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
@@ -32,7 +36,10 @@ class MainViewModel @Inject constructor(
     private val getCandyListCaseUse: GetCandyListCaseUse,
     private val payingCaseUse: PayingCaseUse,
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val googleSignInClient: GoogleSignInClient
+
+
 ) : ViewModel(){
 
     private val _selectedTab = MutableLiveData<Tab>(Tab.Premier)
@@ -47,6 +54,24 @@ class MainViewModel @Inject constructor(
 
     private val _authState = MutableLiveData<AuthState>(AuthState.Idle)
     val authState: LiveData<AuthState> = _authState
+
+    private val _cardNumberError = MutableLiveData<String?>()
+    val cardNumberError: LiveData<String?> = _cardNumberError
+
+    private val _cvvError = MutableLiveData<String?>()
+    val cvvError: LiveData<String?> = _cvvError
+
+    private val _emailError = MutableLiveData<String?>()
+    val emailError: LiveData<String?> = _emailError
+
+    private val _nameError = MutableLiveData<String?>()
+    val nameError: LiveData<String?> = _nameError
+
+    private val _docError = MutableLiveData<String?>()
+    val docError: LiveData<String?> = _docError
+
+    private val _dateError = MutableLiveData<String?>()
+    val dateError: LiveData<String?> = _dateError
 
     init {
         viewModelScope.launch {
@@ -67,6 +92,8 @@ class MainViewModel @Inject constructor(
             val user = signInWithGoogleUseCase(idToken)
             if (user != null) {
                 _authState.value = AuthState.Success(user)
+                val updateCard = user.email?.let { user.displayName?.let { it1 -> _creditCardInfo.value?.copy( email = it, name = it1) } }
+                _creditCardInfo.value = updateCard
                 home()
             } else {
                 _authState.value = AuthState.Error("Authentication failed")
@@ -88,11 +115,20 @@ class MainViewModel @Inject constructor(
             null
         }
     }
-//
-//
-//    fun signOut() {
-//        firebaseAuth.signOut()
-//    }
+
+    suspend fun signOut() {
+        firebaseAuth.signOut()
+        val currentUser: FirebaseUser? = firebaseAuth.currentUser
+        if (currentUser != null) {
+            val signInMethods = firebaseAuth.fetchSignInMethodsForEmail(currentUser.email!!).await()
+            if (signInMethods.signInMethods?.contains(GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD) == true) {
+                googleSignInClient.signOut().addOnCompleteListener {
+                    // Acción adicional después de cerrar la sesión de Google, si es necesario
+                }.await()
+            }
+        }
+
+    }
 
     fun selectTab(tab: Tab) {
         _selectedTab.value = tab
@@ -133,38 +169,75 @@ class MainViewModel @Inject constructor(
 
 
     fun onCardNumberChange(cardNumber: String) {
-        val updateCard = _creditCardInfo.value?.copy( cardNumber = cardNumber )
-        _creditCardInfo.value = updateCard
+
+        if(cardNumber.length < 17){
+            val updateCard = _creditCardInfo.value?.copy( cardNumber = cardNumber )
+            _creditCardInfo.value = updateCard
+        }
+
+        if(cardNumber.length >= 16 && cardNumber.all { it.isDigit() } ){
+            _cardNumberError.value = null
+        } else {
+            _cardNumberError.value = "El número de tarjeta debe tener 16 dígitos numéricos"
+        }
     }
 
     fun onExpirationDateChange(expirationDate: String) {
+
         val updateCard = _creditCardInfo.value?.copy( expirationDate = expirationDate )
         _creditCardInfo.value = updateCard
+        val formattedDate = when (expirationDate.length) {
+            1, 2 -> expirationDate
+            3 -> if (expirationDate[2] == '/') expirationDate else "${expirationDate.substring(0, 2)}/${expirationDate[2]}"
+            4, 5 -> if (expirationDate[2] == '/') expirationDate else "${expirationDate.substring(0, 2)}/${expirationDate.substring(2)}"
+            else -> expirationDate
+        }
+
     }
 
     fun onCvvChange(cvv: String) {
-        val updateCard = _creditCardInfo.value?.copy( cvv = cvv )
-        _creditCardInfo.value = updateCard
+        if(cvv.length < 4){
+            val updateCard = _creditCardInfo.value?.copy( cvv = cvv )
+            _creditCardInfo.value = updateCard
+        }
+        if(cvv.length >= 2 && cvv.all { it.isDigit() } ){
+            _cvvError.value = null
+        } else {
+            _cvvError.value = "Ingrese un CVV Valido"
+        }
     }
 
     fun onEmailChange(email: String) {
         val updateCard = _creditCardInfo.value?.copy( email = email )
         _creditCardInfo.value = updateCard
+
+        if(email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            _emailError.value = null
+        } else {
+            _emailError.value = "Ingrese un correo valido"
+        }
+
     }
 
     fun onNameChange(name: String) {
         val updateCard = _creditCardInfo.value?.copy( name = name )
         _creditCardInfo.value = updateCard
-    }
-
-    fun onDocumentTypeChange(documentType: String) {
-        val updateCard = _creditCardInfo.value?.copy( documentType = documentType )
-        _creditCardInfo.value = updateCard
+        if(name.isNotEmpty()){
+            _nameError.value = null
+        } else {
+            _nameError.value = "Ingrese un nombre valido"
+        }
     }
 
     fun onDocumentNumberChange(documentNumber: String) {
         val updateCard = _creditCardInfo.value?.copy( documentNumber = documentNumber )
         _creditCardInfo.value = updateCard
+
+        if(documentNumber.length >= 8 && documentNumber.all { it.isDigit() } ){
+            _docError.value = null
+        } else {
+            _docError.value = "Ingrese un número de documento valido"
+        }
     }
 
     fun pay(cardInfo: CardInfoRequest): CardInfoResponse {

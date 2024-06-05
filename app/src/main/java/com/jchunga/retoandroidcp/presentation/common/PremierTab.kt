@@ -1,5 +1,6 @@
 package com.jchunga.retoandroidcp.presentation.common
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,8 @@ fun PremierTab(
 
     val listState = rememberLazyListState()
 
+    val isdark = isSystemInDarkTheme()
+
     // Actualiza el índice de la tarjeta cada segundo
     LaunchedEffect(Unit) {
 
@@ -57,9 +60,6 @@ fun PremierTab(
                     premierList = state.premieres.premieres,
                     itemIndex = index,
                 )
-            }
-            item(){
-
             }
         }
 

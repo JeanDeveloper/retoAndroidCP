@@ -6,7 +6,7 @@ data class CreditCardInfo(
     var cvv: String = "",
     var email: String = "",
     var name: String = "",
-    var documentType: String = "",
+//    var documentType: String = "",
     var documentNumber: String = "",
     var isLoading: Boolean = false
 )

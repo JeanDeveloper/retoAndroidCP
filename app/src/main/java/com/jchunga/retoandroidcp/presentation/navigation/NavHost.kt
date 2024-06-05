@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jchunga.retoandroidcp.core.Screen
 import com.jchunga.retoandroidcp.core.Tab
 import com.jchunga.retoandroidcp.presentation.common.CandyTab
@@ -22,17 +23,19 @@ import com.jchunga.retoandroidcp.presentation.screen.SuccessScreen
 
 val localHomeNavController = compositionLocalOf<NavController> { error("HomeNavcontroller") }
 
+//@RequiresApi(Build.VERSION_CODES.O)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navigation(
+    firebaseAuth: FirebaseAuth,
 
 ) {
     val navController = rememberNavController()
     CompositionLocalProvider(value = localHomeNavController provides navController) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route
-//            startDestination = if (isLoggedIn) {
+            startDestination = Screen.Home.route
+//            startDestination = if (firebaseAuth.currentUser != null) {
 //                Screen.Home.route
 //            } else {
 //                Screen.Login.route

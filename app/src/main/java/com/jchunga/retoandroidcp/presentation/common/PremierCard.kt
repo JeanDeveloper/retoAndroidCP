@@ -1,9 +1,11 @@
 package com.jchunga.retoandroidcp.presentation.common
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +31,9 @@ import com.jchunga.retoandroidcp.domain.model.Premier
 import com.jchunga.retoandroidcp.presentation.navigation.localHomeNavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jchunga.retoandroidcp.core.Screen
 import com.jchunga.retoandroidcp.core.Tab
 import com.jchunga.retoandroidcp.presentation.viewmodel.MainViewModel
 
@@ -41,11 +45,17 @@ fun PremierCard(
     premierList: List<Premier>,
     mainViewModel: MainViewModel = hiltViewModel(),
 ) {
+
+    val user = mainViewModel.getCurrentUser()
     val navController = localHomeNavController.current
+    val context = LocalContext.current
+
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ){
+
+        val isdark = isSystemInDarkTheme()
 
         Card(
             Modifier
@@ -55,7 +65,12 @@ fun PremierCard(
                 .clickable {
                     println(premierList[itemIndex].description)
                     //verificar si hay un usuario logeado
-                    mainViewModel.selectTab(Tab.Candy)
+                    if(user == null){
+                        Toast.makeText(context, "Primero Inicia Sesion", Toast.LENGTH_LONG).show()
+                        navController.navigate(Screen.Login.route)
+                    }else{
+                        mainViewModel.selectTab(Tab.Candy)
+                    }
 //               navController.navigate("Detail Screen/${movieList[itemIndex].id}")
                 },
 
@@ -85,7 +100,7 @@ fun PremierCard(
                 .align(Alignment.CenterHorizontally)
                 .basicMarquee(),
             textAlign = TextAlign.Center,
-            color = Color.White,
+            color =  if(isdark) Color.White else Color.Black ,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             style = TextStyle(

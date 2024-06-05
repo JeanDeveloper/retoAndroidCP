@@ -5,6 +5,5 @@ import com.jchunga.retoandroidcp.domain.model.User
 interface IAuthRepository {
 
     suspend fun signInWithGoogle(idToken: String): User?
-    suspend fun singOut()
 
 }

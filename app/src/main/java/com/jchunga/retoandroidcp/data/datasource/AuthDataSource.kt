@@ -19,10 +19,6 @@ interface IAuthDataSource {
 
     suspend fun signInWithGoogleCredential(credential: AuthCredential): AuthRes<FirebaseUser>?
 
-    suspend fun signOut()
-
-    fun getCurrentUser(): FirebaseUser?
-
 }
 
 class FirebaseDataSource @Inject constructor( private val auth: FirebaseAuth ) : IAuthDataSource {
@@ -63,12 +59,5 @@ class FirebaseDataSource @Inject constructor( private val auth: FirebaseAuth ) :
         }
     }
 
-    override suspend fun signOut() {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCurrentUser(): FirebaseUser? {
-        TODO("Not yet implemented")
-    }
 
 }

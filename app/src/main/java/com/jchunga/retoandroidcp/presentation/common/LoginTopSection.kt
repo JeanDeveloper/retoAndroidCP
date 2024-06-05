@@ -1,6 +1,7 @@
 package com.jchunga.retoandroidcp.presentation.common
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,9 @@ import com.jchunga.retoandroidcp.ui.theme.PoppinsFontFamily
 
 @Composable
 fun LoginTopSection(){
+
+    val isDark = isSystemInDarkTheme()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -36,9 +40,9 @@ fun LoginTopSection(){
 
         Text(
             text = "ECOMMERCE CINEPLANET",
-            fontSize = 28.sp,
+            fontSize = 25.sp,
             fontFamily = PoppinsFontFamily,
-            color = Color.Black,
+            color =  if(isDark) Color.White else Color.Black
         )
     }
 }

@@ -2,16 +2,22 @@ package com.jchunga.retoandroidcp.presentation.screen
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -49,9 +55,7 @@ import javax.inject.Inject
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview(showBackground = true)
 @Composable
-fun LoginScreen(
-){
-
+fun LoginScreen(){
     val navController = localHomeNavController.current
 
     LoginScreenContent(
@@ -88,36 +92,19 @@ fun LoginScreenContent(
                 scope.launch {
                     mainViewModel.signInWithGoogle(idToken){
                         navigatorTo(Screen.Home)
-
                     }
                 }
             }
         }
     }
 
-
-// ESTO ESTA BIEN
-//    val launcher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.StartActivityForResult()
-//    ) {
-//        val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-//        try{
-//            val account = task.getResult(ApiException::class.java)
-//            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-//            mainViewModel.signInWithGoogleCredential(credential){
-//                navigatorTo(Screen.Home)
-//            }
-//        }
-//        catch (e: ApiException){
-//            Log.d("Paso algo", "LoginScreenContent: ${e.message}")
-//        }
-//    }
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
     ) {
+
+        val isdark = isSystemInDarkTheme()
 
         Surface(
             modifier = Modifier
@@ -133,6 +120,7 @@ fun LoginScreenContent(
                     .verticalScroll(rememberScrollState())
             ) {
                 LoginTopSection()
+                Spacer(modifier = Modifier.height(20.dp))
 
                 SocialMediaButton(
                     icon = R.drawable.google,
@@ -141,7 +129,6 @@ fun LoginScreenContent(
                         .fillMaxWidth()
                         .height(60.dp),
                     onClick = {
-
                         val googleSignInClient = GoogleSignIn.getClient(
                             context,
                             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -152,24 +139,22 @@ fun LoginScreenContent(
                         val signInIntent = googleSignInClient.signInIntent
                         signInLauncher.launch(signInIntent)
 
-//                        val options = GoogleSignInOptions.Builder(
-//                            GoogleSignInOptions.DEFAULT_SIGN_IN
-//                        )
-//                            .requestIdToken(Util.Token)
-//                            .requestEmail()
-//                            .build()
-//                        val googleSignInClient = GoogleSignIn.getClient(context, options)
-//                        launcher.launch(googleSignInClient.signInIntent)
                     }
                 )
+                Spacer(modifier = Modifier.height(20.dp))
 
                 SocialMediaButton(
-                    icon = R.drawable.google,
+                    icon = R.drawable.anonimo,
                     text = "Anonimo",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
-                    onClick = {}
+                    onClick = {
+                        scope.launch {
+                            Toast.makeText(context, "Estamos trabajando para ofrecerte nuevas funciones", Toast.LENGTH_LONG).show()
+                        }
+
+                    }
                 )
 
             }

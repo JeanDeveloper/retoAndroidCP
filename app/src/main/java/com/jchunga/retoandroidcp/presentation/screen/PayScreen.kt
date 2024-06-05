@@ -21,10 +21,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +50,19 @@ fun PayScreen(
 ) {
 
     val card by mainViewModel.creditCardInfo.observeAsState(CreditCardInfo())
+    val state by mainViewModel.state.observeAsState()
+
+    val cardNumberError by mainViewModel.cardNumberError.observeAsState("")
+
+    val cvvError by mainViewModel.cvvError.observeAsState("")
+
+    val emailError by mainViewModel.emailError.observeAsState("")
+
+    val nameError by mainViewModel.nameError.observeAsState("")
+
+    val docError by mainViewModel.docError.observeAsState("")
+
+    val dateError by mainViewModel.dateError.observeAsState("")
 
     val navController = localHomeNavController.current
 
@@ -75,32 +90,75 @@ fun PayScreen(
             },
             label = { Text("Número de tarjeta") },
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number,),
+            modifier = Modifier.fillMaxWidth(),
+            isError = cardNumberError != null
         )
+        if (cardNumberError != null) {
+            Text(
+                text = cardNumberError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Row {
-            OutlinedTextField(
-                value = card.expirationDate,
-                onValueChange = {
-                    mainViewModel.onExpirationDateChange(it)
-                },
-                label = { Text("Fecha de expiración") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
-            )
+            Column (
+                modifier = Modifier
+                    .wrapContentSize()
+                    .weight(1f)
+                    .height(75.dp)
+            ){
+                OutlinedTextField(
+                    value = card.expirationDate,
+                    onValueChange = {
+                        mainViewModel.onExpirationDateChange(it)
+                    },
+                    label = { Text("Fecha de expiración") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f),
+                    isError = dateError != null
+                )
+                if (dateError != null) {
+                    Text(
+                        text = dateError ?: "",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.width(16.dp))
-            OutlinedTextField(
-                value = card.cvv,
-                onValueChange = {
-                    mainViewModel.onCvvChange(it)
-                },
-                label = { Text("CVV") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
-            )
+            Column (
+                modifier = Modifier
+                    .wrapContentSize()
+                    .weight(1f)
+                    .height(75.dp)
+            ){
+                OutlinedTextField(
+                    value = card.cvv,
+                    onValueChange = {
+                        mainViewModel.onCvvChange(it)
+                    },
+                    label = { Text("CVV") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f),
+                    isError = cvvError != null
+                )
+                if (cvvError != null) {
+                    Text(
+                        text = cvvError ?: "",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+
         }
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
@@ -110,8 +168,17 @@ fun PayScreen(
             },
             label = { Text("Correo electrónico") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = emailError != null
         )
+        if (emailError != null) {
+            Text(
+                text = emailError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = card.name,
@@ -120,30 +187,40 @@ fun PayScreen(
             },
             label = { Text("Nombre") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = nameError != null
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Row {
-            OutlinedTextField(
-                value = card.documentType,
-                onValueChange = {
-                    mainViewModel.onDocumentTypeChange(it)
-                },
-                label = { Text("Tipo de documento") },
-                singleLine = true,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            OutlinedTextField(
-                value = card.documentNumber,
-                onValueChange = {
-                    mainViewModel.onDocumentNumberChange(it)
-                },
-                label = { Text("Número de documento") },
-                singleLine = true,
-                modifier = Modifier.weight(1f)
+
+        if (nameError != null) {
+            Text(
+                text = nameError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp)
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = card.documentNumber,
+            onValueChange = {
+                mainViewModel.onDocumentNumberChange(it)
+            },
+            label = { Text("Número de documento") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number,),
+            modifier = Modifier.fillMaxWidth(),
+            isError = docError != null
+        )
+        if (docError != null) {
+            Text(
+                text = docError ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+
         Spacer(modifier = Modifier.height(30.dp))
         Button(
             onClick = {
@@ -156,14 +233,26 @@ fun PayScreen(
                     operation_date =currentDateTime
                 )
 
-                scope.launch {
-                    val resp = mainViewModel.pay(request)
-                    navController.navigate(Screen.Success.route){
-                        popUpTo(Screen.Home.route) {
-                            inclusive = false
+                if (card.cardNumber.length == 16 && card.cvv.length == 3
+                    && card.email.isNotEmpty() && card.name.isNotEmpty()
+                    && card.documentNumber.isNotEmpty() && card.expirationDate.isNotEmpty() ) {
+                    scope.launch {
+                        val resp = mainViewModel.pay(request)
+                        navController.navigate(Screen.Success.route) {
+                            popUpTo(Screen.Home.route) {
+                                inclusive = false
+                            }
                         }
                     }
+                } else {
+                    mainViewModel.onCardNumberChange(card.cardNumber) // Para actualizar el error
+                    mainViewModel.onCvvChange(card.cvv)
+                    mainViewModel.onEmailChange(card.email)
+                    mainViewModel.onNameChange(card.name)
+                    mainViewModel.onDocumentNumberChange(card.documentNumber)
+                    mainViewModel.onExpirationDateChange(card.expirationDate)
                 }
+
 
             },
             modifier = Modifier
