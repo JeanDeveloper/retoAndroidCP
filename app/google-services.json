@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "457597510178",
+    "project_id": "ktapp-90991",
+    "storage_bucket": "ktapp-90991.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:457597510178:android:1106236448ad40c62c607b",
+        "android_client_info": {
+          "package_name": "com.jchunga.retoandroidcp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "457597510178-4b09jbbrbdblk2f6e80cd4tbgsqmoiag.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jchunga.retoandroidcp",
+            "certificate_hash": "c2046495c38777caae216153a0c987091d349e6d"
+          }
+        },
+        {
+          "client_id": "457597510178-865c3iv4v2ls8r0ltq7bn8iclbgdo45f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvZ_kZIUt-ILcRLI8hcGpudfwdSmpmWFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "457597510178-865c3iv4v2ls8r0ltq7bn8iclbgdo45f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
